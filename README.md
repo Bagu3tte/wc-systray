@@ -25,8 +25,8 @@ A system tray to obtain the status of the toilets in the Franklin Building.
 
 #### From Windows to Mac OS
 
-- `GOOS=darwin GOARCH=amd64 go build -ldflags -o wc-systray.app *.go`
+- `GOOS=darwin GOARCH=amd64 go build go build -o wc-systray.app/Contents/MacOS/wc-systray *.go`
 
 #### From Windows to linux
 
-- `GOOS=linux GOARCH=amd64 go build -ldflags -o wc-systray *.go`
+- `GOOS=linux GOARCH=amd64 go build -o wc-systray *.go`

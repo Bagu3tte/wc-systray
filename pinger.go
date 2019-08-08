@@ -4,6 +4,7 @@ import (
 	"net"
 	"os/exec"
 	"runtime"
+	"syscall"
 )
 
 func hosts(cidr string) ([]string, error) {
@@ -39,6 +40,7 @@ func ping(pingChan <-chan string, pongChan chan<- Pong) {
 		if runtime.GOOS == "windows" {
 			cmd = exec.Command("ping", "-n", "1", "-w", "2", ip)
 		}
+		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 		_, err := cmd.Output()
 		var alive bool
 		if err != nil {
