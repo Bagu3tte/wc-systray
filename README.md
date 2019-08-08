@@ -23,10 +23,10 @@ A system tray to obtain the status of the toilets in the Franklin Building.
 
 - `go build -ldflags -H=windowsgui -o wc-systray.exe *.go`
 
-#### From Windows to Mac OS
+#### From Windows to Mac OS (in progress)
 
-- `GOOS=darwin GOARCH=amd64 go build go build -o wc-systray.app/Contents/MacOS/wc-systray *.go`
+- `GOOS=darwin GOARCH=amd64 go build -o wc-systray.app/Contents/MacOS/wc-systray *.go`
 
-#### From Windows to linux
+#### From Windows to linux (in progress)
 
 - `GOOS=linux GOARCH=amd64 go build -o wc-systray *.go`
