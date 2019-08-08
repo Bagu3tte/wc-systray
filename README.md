@@ -15,12 +15,18 @@ A system tray to obtain the status of the toilets in the Franklin Building.
 
 #### Linux
 
-### Dependencies
-
-- `go get ./...`
+- `sudo apt-get install libgtk-3-dev libappindicator3-dev`
 
 ### Build
 
 #### Windows
 
 - `go build -ldflags -H=windowsgui -o wc-systray.exe *.go`
+
+#### From Windows to Mac OS
+
+- `GOOS=darwin GOARCH=amd64 go build -ldflags -o wc-systray.app *.go`
+
+#### From Windows to linux
+
+- `GOOS=linux GOARCH=amd64 go build -ldflags -o wc-systray *.go`

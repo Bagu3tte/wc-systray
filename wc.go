@@ -12,14 +12,21 @@ import (
 )
 
 var url = "https://e1z1mdq2mb.execute-api.eu-west-1.amazonaws.com/default/currentstatus"
+var Port = "8155"
+var CurrentStatus Status
+var Friends []Pong
 
 func main() {
+	Server()
 	systray.Run(onReady, onExit)
 }
 
 func onReady() {
 	systray.SetTitle("Sixmon WC")
+	// set to close
 	close()
+
+	mRefresh := systray.AddMenuItem("Rafraîchir", "Rafraîchir l'application")
 	mQuitOrig := systray.AddMenuItem("Quitter", "Quitte l'application")
 	go func() {
 		<-mQuitOrig.ClickedCh
@@ -28,10 +35,22 @@ func onReady() {
 		fmt.Println("Finished quitting")
 	}()
 
-	r := req.New()
-	for range time.Tick(2 * time.Second) {
+	go func() {
+		<-mRefresh.ClickedCh
+		r := req.New()
 		getWCStatus(r)
-	}
+	}()
+
+	r := req.New()
+	go func(r *req.Req) {
+		for range time.Tick(15 * time.Second) {
+			now := time.Now()
+			if (CurrentStatus != Status{} && now.Sub(CurrentStatus.ReceivedAt).Seconds() > 10) {
+				go getWCStatus(r)
+			}
+		}
+	}(r)
+	Friends = FindNewFriends()
 }
 
 func onExit() {
@@ -44,13 +63,31 @@ func getWCStatus(req *req.Req) {
 		log.Fatal(err)
 	}
 
-	var status Status
-	err = r.ToJSON(&status)
+	err = r.ToJSON(&CurrentStatus)
 	if err != nil {
 		log.Fatal(err)
 	}
+	CurrentStatus.ReceivedAt = time.Now()
+	CheckStatus()
 
-	if status.Vaccant {
+	shareToFriends(req)
+}
+
+func shareToFriends(r *req.Req) {
+	for i, friend := range Friends {
+		if friend.Alive {
+			go func(i int, friend Pong) {
+				_, err := r.Post("http://"+friend.Ip+":"+Port+"/status", req.BodyJSON(&CurrentStatus))
+				if err != nil {
+					friend.Alive = false
+				}
+			}(i, friend)
+		}
+	}
+}
+
+func CheckStatus() {
+	if CurrentStatus.Vaccant {
 		open()
 	} else {
 		close()
